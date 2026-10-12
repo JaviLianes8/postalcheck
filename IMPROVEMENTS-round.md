@@ -3,12 +3,12 @@
 Progress:
 - [x] Brainstorm ranked improvements (this file)
 - [x] Pin the ground truth: libaddressinput data for every country, Eircode routing keys
-- [ ] Rules for every country with postal codes, checked against the pinned data
-- [ ] Input normalization: Unicode width, native digits, dashes, separator positions
-- [ ] Typed API: errors with attributes, `example`, country aliases, no-postal-code countries
-- [ ] Contracts: pinned examples, regex oracle both ways, README, typing, installed wheel
-- [ ] Command line: `python -m postalcheck`
-- [ ] Docs and packaging: README, CHANGELOG, docstrings, metadata
+- [x] Rules for every country with postal codes, checked against the pinned data
+- [x] Input normalization: Unicode width, native digits, dashes, separator positions
+- [x] Typed API: errors with attributes, `example`, country aliases, no-postal-code countries
+- [x] Contracts: pinned examples, regex oracle both ways, README, typing, installed wheel
+- [x] Command line: `python -m postalcheck`
+- [x] Docs and packaging: README, CHANGELOG, docstrings, metadata
 - [ ] Gates: ruff format, ruff check, mypy --strict, pytest
 - [ ] Mutation run: removing guarded logic makes the suite fail
 - [ ] Independent review findings fixed with regression tests
