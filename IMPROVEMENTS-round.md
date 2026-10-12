@@ -42,7 +42,8 @@ Progress:
 - Google libaddressinput address metadata, the data set behind Chrome and Android address
   forms, https://chromium-i18n.appspot.com/ssl-address/data/<CC> for each of the 252 country
   keys listed at https://chromium-i18n.appspot.com/ssl-address/data. Each response body is
-  committed unchanged, one per line, in `tests/data/libaddressinput.jsonl`
+  kept unchanged, one per line, in `tests/upstream/libaddressinput.jsonl` (not committed,
+  fetched by `scripts/fetch_upstream.py`)
   (sha256 f2417db82d928fe0b19c557ca97fd321f6498dfc775d6338e990f1b1981bc112). The `zip`
   field is the format regular expression, `zipex` lists real codes; 182 countries have one.
 - Eircode, https://www.eircode.ie/what-is-eircode and https://www.eircode.ie/faqs: a routing
@@ -50,8 +51,8 @@ Progress:
   in the character set used for Eircodes, but the letter 'O' is not".
 - The 139 Eircode routing keys, Wikipedia "List of Eircode routing areas in Ireland",
   revision 1348214965 (2026-04-11),
-  https://en.wikipedia.org/w/index.php?oldid=1348214965&action=raw, committed unchanged as
-  `tests/data/eircode-routing-keys.wiki`
+  https://en.wikipedia.org/w/index.php?oldid=1348214965&action=raw, kept unchanged as
+  `tests/upstream/eircode-routing-keys.wiki` (not committed, fetched by the same script)
   (sha256 e5d46fe105832ebda145cc9bb538c4b5a041332d1587f7fbc26634e7d1e7dcbb).
 
 Invalid samples in the tests are written by hand and labelled as such.

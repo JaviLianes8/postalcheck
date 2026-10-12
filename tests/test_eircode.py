@@ -5,13 +5,13 @@ from __future__ import annotations
 import re
 
 import pytest
-from upstream import EIRCODE_KEYS
+from upstream import eircode_page
 
 from postalcheck import is_valid, normalize
 
 
 def _routing_keys() -> list[str]:
-    text = EIRCODE_KEYS.read_text(encoding="utf-8")
+    text = eircode_page()
     return sorted(set(re.findall(r"^\| *([A-Z0-9]{3}) *\|\|", text, flags=re.MULTILINE)))
 
 
@@ -19,8 +19,15 @@ def test_the_pinned_page_lists_139_routing_keys() -> None:
     assert len(_routing_keys()) == 139
 
 
-@pytest.mark.parametrize("key", _routing_keys())
-def test_every_routing_key_is_accepted(key: str) -> None:
+def test_every_routing_key_is_accepted() -> None:
+    for key in _routing_keys():
+        assert normalize("IE", f"{key}ab12") == f"{key} AB12", key
+
+
+# Hand-written: a few routing keys in use (Dublin 1, 2 and 6W, Cork, Galway, Limerick), so
+# the rule is exercised without the fetched page.
+@pytest.mark.parametrize("key", ["D01", "D02", "D6W", "T12", "H91", "V94"])
+def test_known_routing_keys_are_accepted(key: str) -> None:
     assert normalize("IE", f"{key}ab12") == f"{key} AB12"
 
 
@@ -32,6 +39,9 @@ def test_routing_key_letters_are_exactly_those_in_use() -> None:
 
 def test_d6w_is_the_only_routing_key_ending_in_a_letter() -> None:
     assert [key for key in _routing_keys() if not key[2].isdigit()] == ["D6W"]
+
+
+def test_only_d6w_may_end_in_a_letter() -> None:
     assert is_valid("IE", "D6W PV38")
     assert not is_valid("IE", "D6X PV38")
     assert not is_valid("IE", "A6W PV38")

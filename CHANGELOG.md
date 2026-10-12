@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-10-13
+
+### Changed
+
+- The libaddressinput data and the Eircode routing key page are no longer committed or
+  shipped in the sdist: `scripts/fetch_upstream.py` fetches them, checked against
+  `tests/upstream/MANIFEST.json`. Every rule is still tested against its own example and
+  a hand-written set of routing keys when the files are absent.
+
 ## [0.2.0]
 
 ### Added

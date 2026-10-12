@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "postalcheck"
-version = "0.2.0"
+version = "0.2.1"
 description = "Validate and normalize postal and ZIP codes for the 182 countries and territories that use them, checked against Google libaddressinput data, zero dependencies, fully typed"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -44,7 +44,17 @@ Funding = "https://buymeacoffee.com/jlianesglrs"
 postalcheck = "postalcheck._cli:main"
 
 [tool.hatch.build.targets.sdist]
-exclude = [".github", "IMPROVEMENTS-round*.md"]
+# Third-party test files are fetched locally and never shipped; only their manifest is.
+include = [
+    "src/postalcheck",
+    "tests/*.py",
+    "tests/upstream/MANIFEST.json",
+    "scripts/fetch_upstream.py",
+    "CHANGELOG.md",
+    "README.md",
+    "LICENSE",
+    "pyproject.toml",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/postalcheck"]

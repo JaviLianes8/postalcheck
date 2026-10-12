@@ -67,7 +67,10 @@ def test_installed_wheel_end_to_end(tmp_path: Path) -> None:
     assert not any(name.startswith("tests/") for name in names)
     sdist_listing = _run(sys.executable, "-m", "tarfile", "-l", sdist).stdout
     assert "IMPROVEMENTS-round" not in sdist_listing
-    assert "tests/data/libaddressinput.jsonl" in sdist_listing
+    assert "tests/upstream/MANIFEST.json" in sdist_listing
+    assert "libaddressinput.jsonl" not in sdist_listing
+    assert "eircode-routing-keys.wiki" not in sdist_listing
+    assert not any(name.startswith("tests/upstream/") for name in names)
 
     env_dir = tmp_path / "venv"
     venv.create(env_dir, with_pip=True)
