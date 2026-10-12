@@ -23,6 +23,7 @@ from postalcheck import is_valid, normalize
         ("CA", "K1A\u00a00B1", "K1A 0B1"),
         ("CA", "K1A\u30000B1", "K1A 0B1"),
         ("CA", "  k1a   0b1\t", "K1A 0B1"),
+        ("CA", "K1A\t0B1", "K1A 0B1"),
         ("US", "12345 - 6789", "12345-6789"),
         ("PL", "00\ufe63950", "00-950"),
         ("PL", "00\u00ad950", "00-950"),

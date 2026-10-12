@@ -11,7 +11,7 @@ Progress:
 - [x] Docs and packaging: README, CHANGELOG, docstrings, metadata
 - [x] Gates: ruff format, ruff check, mypy --strict, pytest
 - [x] Mutation run: removing guarded logic makes the suite fail
-- [ ] Independent review findings fixed with regression tests
+- [x] Independent review findings fixed with regression tests
 - [ ] Pull request opened, guard clean
 
 ## Starting point
@@ -99,10 +99,39 @@ Invalid samples in the tests are written by hand and labelled as such.
   its layout except Sweden), and for each country 300 strings drawn from the upstream
   pattern (accepted here), 300 drawn from ours (normal form accepted upstream) and 300 near
   misses (both sides agree). Ireland and Argentina differ only in the documented ways.
-- Guarded logic was removed one piece at a time (64 mutations). The first run left four
-  alive: a leading-separator check that could never fire (a cut at position 0 is refused
-  anyway, now removed), a length bound in `split_letters` that no pattern can reach (now
-  removed), and `re.ASCII` on the patterns, now pinned by a test that calls every pattern
-  with Arabic-Indic digits. The suite now fails for 63 of 64. The survivor drops the
-  `sorted` in `supported_countries`, which is equivalent while the tables are written in
-  order; it stays so that a table edit cannot change the order.
+- Guarded logic was removed one piece at a time (77 mutations after the review fixes). The
+  first run left four alive: a leading-separator check that could never fire (a cut at
+  position 0 is refused anyway, now removed), a length bound in `split_letters` that no
+  pattern can reach (now removed), and `re.ASCII` on the patterns, now pinned by a test that
+  calls every pattern with Arabic-Indic digits; after the review a tab inside a code was
+  untested, now tested. The suite now fails for 75 of 77. The two survivors: dropping the
+  `sorted` in `supported_countries`, equivalent while the tables are written in order (it
+  stays so that a table edit cannot change the order); and pointing stdout at devnull after
+  a closed pipe, which only silences the interpreter's final flush message on POSIX and
+  cannot be observed on the Windows machine that ran the suite.
+
+## Review fixes
+
+An independent review attacked the branch; every finding is fixed, each with a test that
+fails when the fix is removed:
+
+- The extra separator positions of Anguilla and Oman also applied to the bare code, so
+  `26-40` (AI) and `13 3` (OM) were valid. They now apply only after the `AI` and `PC`
+  prefixes. The near-miss oracle did not catch it because it never compared separator
+  positions with upstream; it now does (every separator given must sit where some upstream
+  spelling with a space or a dash puts one), and fails on the old rules.
+- Country strings went through `str.upper()`, which turns `ı`, `ſ`, `ß` and `ﬅ` into ASCII:
+  `ıt` was read as Italy. Non-ASCII country strings are now unknown.
+- The command line read piped stdin in the console code page, so full-width and native
+  digit input failed on Windows unless UTF-8 mode was on, and a byte order mark made the
+  first line invalid. Stdin is now read as UTF-8 (BOM ignored), line by line, and a reader
+  that goes away ends the command quietly instead of with a traceback.
+- Line breaks, control characters and other `isspace` characters counted as separators.
+  Only spaces (category Zs) and tabs do now; the soft hyphen and small hyphen-minus were
+  added to the dashes.
+- Echoed input did not escape a backslash, so `` typed out looked like an escape.
+- Docs: decimal digits of every script fold (mathematical digits included), the separator
+  extras are listed, the README says which `country` each error keeps and that the
+  upstream comparison is on random samples, and the CHANGELOG says Ireland's last four
+  characters are looser than in 0.1.0 (the 0.1.0 letter set had no fetched source).
+- Two weak tests were fixed (a pickled message compared with itself, a pattern-text check).
