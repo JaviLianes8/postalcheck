@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "postalcheck"
-version = "0.1.0"
+version = "0.2.0"
 description = "Validate and normalize postal and ZIP codes by ISO country code against a bundled per-country table"
 readme = "README.md"
 requires-python = ">=3.10"
