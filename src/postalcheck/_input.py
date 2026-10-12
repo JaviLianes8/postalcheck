@@ -5,7 +5,7 @@ from __future__ import annotations
 import unicodedata
 
 # Dashes pasted from word processors, and the katakana prolonged sound mark that Japanese
-# input methods often produce in place of a hyphen (U+30FC, as in 15430fc0023).
+# input methods often produce in place of a hyphen (U+30FC).
 _DASHES = frozenset("-\u2010\u2011\u2012\u2013\u2014\u2015\u2212\u30fc")
 _WIDTH_FORMS = ("<wide>", "<narrow>")
 _ASCII = frozenset("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
