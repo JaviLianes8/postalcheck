@@ -6,6 +6,43 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0]
+
+### Added
+
+- Rules for all 182 countries and territories that use postal codes (51 before), each
+  transcribed from Google libaddressinput and tested against its published examples.
+- `example(country)`: a real code in canonical layout, for form placeholders.
+- `UnknownCountryError.has_postal_codes`, `False` for the 70 countries and territories
+  without postal codes. Both errors keep their inputs (`country`, `code`) and pickle.
+- `UK` is read as `GB`.
+- Full-width forms, decimal digits of any script, Unicode dashes and no-break spaces in
+  the input are folded to ASCII.
+- Command line: `postalcheck COUNTRY [CODE ...]` and `python -m postalcheck`, reading
+  UTF-8 lines from standard input when no code is given.
+
+### Changed
+
+- Spaces and dashes are allowed only where the country writes a separator:
+  `9-0-2-1-0` is no longer a valid US ZIP code. Line breaks and control characters inside
+  a code are refused.
+- Matching is ASCII only: other scripts' digits are converted first, never matched as is.
+- A non-`str` argument raises `TypeError` with a clear message.
+- A country string that is not ASCII is unknown: `str.upper()` no longer turns `ıt` into
+  `IT`.
+- Ireland: the last four characters follow the Eircode FAQ (any digit or letter except O),
+  which accepts some letters the 0.1.0 table refused (`A65 BBBB`); the routing key is
+  checked against the 139 published routing keys.
+
+### Fixed
+
+- Latvia: `LV-1073` was refused; bare digits now normalize to that form.
+- Vietnam: five-digit codes (in use since 2018) were refused.
+- Israel: five-digit codes were refused.
+- Netherlands: codes starting with 0 and the letter pairs SA, SD and SS were accepted.
+- United Kingdom: postcode areas and inward letters that do not exist were accepted.
+- Argentina: CPA codes with I or O as province letter were accepted.
+
 ## [0.1.0]
 
 - First release.

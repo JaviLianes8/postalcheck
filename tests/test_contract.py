@@ -5,6 +5,7 @@ import postalcheck
 PUBLIC_API: list[str] = [
     "InvalidPostalCodeError",
     "UnknownCountryError",
+    "example",
     "is_valid",
     "normalize",
     "supported_countries",
