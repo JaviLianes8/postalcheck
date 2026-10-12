@@ -7,20 +7,24 @@ import unicodedata
 # Dashes pasted from word processors, and the katakana prolonged sound mark that Japanese
 # input methods often produce in place of a hyphen (154ー0023).
 _DASHES = frozenset("-\u2010\u2011\u2012\u2013\u2014\u2015\u2212\u30fc")
+_WIDTH_FORMS = ("<wide>", "<narrow>")
 _ASCII = frozenset("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
 
 
 def split(code: str) -> tuple[str, tuple[int, ...]] | None:
     """Return the compact upper-case code and its separator positions, or ``None``.
 
-    NFKC folds full-width forms, native decimal digits become ASCII, and any run of
+    Full-width and half-width forms fold to their plain form (other compatibility
+    characters such as superscripts do not), native decimal digits become ASCII, any run of
     spaces and dashes counts as one separator. Anything else that is not an ASCII letter
     or digit, and a separator at either end, makes the input unusable.
     """
     chars: list[str] = []
     cuts: list[int] = []
     pending = False
-    for ch in unicodedata.normalize("NFKC", code).strip():
+    for ch in code.strip():
+        if unicodedata.decomposition(ch).startswith(_WIDTH_FORMS):
+            ch = unicodedata.normalize("NFKC", ch)
         if ch.isspace() or ch in _DASHES:
             pending = True
             continue
