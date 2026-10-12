@@ -1,21 +1,30 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
 [project]
 name = "postalcheck"
 version = "0.2.0"
-description = "Validate and normalize postal and ZIP codes by ISO country code against a bundled per-country table"
+description = "Validate and normalize postal and ZIP codes for the 182 countries and territories that use them, checked against Google libaddressinput data, zero dependencies, fully typed"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Javier Lianes", email = "javier@lianes8studio.com" }]
-keywords = ["postal", "postcode", "zip", "validation", "normalize", "country"]
+keywords = ["postal", "postcode", "postal-code", "zip", "zip-code", "eircode", "address", "validation", "normalization", "libaddressinput", "country", "iso3166"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Text Processing",
     "Typing :: Typed",
 ]
 dependencies = []
@@ -30,6 +39,12 @@ Issues = "https://github.com/JaviLianes8/postalcheck/issues"
 Changelog = "https://github.com/JaviLianes8/postalcheck/blob/main/CHANGELOG.md"
 LinkedIn = "https://www.linkedin.com/in/jlianes/"
 Funding = "https://buymeacoffee.com/jlianesglrs"
+
+[project.scripts]
+postalcheck = "postalcheck._cli:main"
+
+[tool.hatch.build.targets.sdist]
+exclude = [".github", "IMPROVEMENTS-round*.md"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/postalcheck"]
