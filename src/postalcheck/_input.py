@@ -33,8 +33,7 @@ def split(code: str) -> tuple[str, tuple[int, ...]] | None:
         elif ch not in _ASCII:
             return None
         if pending:
-            if not chars:
-                return None
+            # A leading separator records a cut at 0, which no country allows.
             cuts.append(len(chars))
             pending = False
         chars.append(ch)

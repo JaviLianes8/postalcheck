@@ -9,8 +9,8 @@ Progress:
 - [x] Contracts: pinned examples, regex oracle both ways, README, typing, installed wheel
 - [x] Command line: `python -m postalcheck`
 - [x] Docs and packaging: README, CHANGELOG, docstrings, metadata
-- [ ] Gates: ruff format, ruff check, mypy --strict, pytest
-- [ ] Mutation run: removing guarded logic makes the suite fail
+- [x] Gates: ruff format, ruff check, mypy --strict, pytest
+- [x] Mutation run: removing guarded logic makes the suite fail
 - [ ] Independent review findings fixed with regression tests
 - [ ] Pull request opened, guard clean
 
@@ -88,3 +88,21 @@ Invalid samples in the tests are written by hand and labelled as such.
 - Matching a code against a state or city (libaddressinput's `sub_zips`).
 - Stripping a country prefix such as `D-10115` or `F-75008`: the old European habit clashes
   with real codes (`DE1 1AA` is a Derby postcode), so it is not guessed.
+
+## Verification
+
+- Gates on CPython 3.13.2: `ruff format --check .`, `ruff check .`, `mypy --strict src tests`
+  and `pytest` (with `POSTALCHECK_E2E=1` the installed-wheel test runs too: it builds the
+  wheel and sdist, installs the wheel in a fresh venv and drives the API and the
+  `postalcheck` console script from an empty folder).
+- Pinned data: all 182 countries with a format, every published example (validates, keeps
+  its layout except Sweden), and for each country 300 strings drawn from the upstream
+  pattern (accepted here), 300 drawn from ours (normal form accepted upstream) and 300 near
+  misses (both sides agree). Ireland and Argentina differ only in the documented ways.
+- Guarded logic was removed one piece at a time (64 mutations). The first run left four
+  alive: a leading-separator check that could never fire (a cut at position 0 is refused
+  anyway, now removed), a length bound in `split_letters` that no pattern can reach (now
+  removed), and `re.ASCII` on the patterns, now pinned by a test that calls every pattern
+  with Arabic-Indic digits. The suite now fails for 63 of 64. The survivor drops the
+  `sorted` in `supported_countries`, which is equivalent while the tables are written in
+  order; it stays so that a table edit cannot change the order.

@@ -67,7 +67,7 @@ def zip_plus_four(code: str) -> str:
 def split_letters(code: str) -> str:
     """Put a space between a leading run of letters and the digits after it."""
     head = len(code) - len(code.lstrip("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
-    return f"{code[:head]} {code[head:]}" if 0 < head < len(code) else code
+    return f"{code[:head]} {code[head:]}" if head else code
 
 
 def drop_prefix(prefix: str) -> Layout:

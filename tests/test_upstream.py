@@ -17,6 +17,7 @@ from upstream import (
 )
 
 from postalcheck import UnknownCountryError, example, is_valid, normalize, supported_countries
+from postalcheck._countries import RULES
 
 # Sweden: canonical layout with a space (kept from 0.1.0), examples upstream have none.
 LAYOUT_DIFFERS = {"SE"}
@@ -55,6 +56,13 @@ def test_every_upstream_example_is_valid_and_keeps_its_layout(country: str) -> N
 @pytest.mark.parametrize("country", zip_countries())
 def test_example_is_the_first_upstream_example_in_canonical_layout(country: str) -> None:
     assert example(country) == normalize(country, examples(country)[0])
+
+
+def test_patterns_match_ascii_digits_only() -> None:
+    arabic_indic = "".join(chr(0x0660 + int(d)) for d in "1234567890")
+    for country, rule in RULES.items():
+        for length in range(3, 11):
+            assert not rule.matches(arabic_indic[:length]), country
 
 
 def test_sweden_uses_the_postnord_layout() -> None:
