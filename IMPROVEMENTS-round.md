@@ -129,7 +129,8 @@ fails when the fix is removed:
 - Line breaks, control characters and other `isspace` characters counted as separators.
   Only spaces (category Zs) and tabs do now; the soft hyphen and small hyphen-minus were
   added to the dashes.
-- Echoed input did not escape a backslash, so `` typed out looked like an escape.
+- Echoed input did not escape a backslash, so the four
+  characters `\x1b` were echoed exactly like a real escape character.
 - Docs: decimal digits of every script fold (mathematical digits included), the separator
   extras are listed, the README says which `country` each error keeps and that the
   upstream comparison is on random samples, and the CHANGELOG says Ireland's last four
