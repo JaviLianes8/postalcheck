@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import contextlib
 import io
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -71,3 +73,74 @@ def test_python_dash_m_runs_the_command_line() -> None:
         cwd=SRC,
     )
     assert (result.returncode, result.stdout, result.stderr) == (0, "154-0023\n", "")
+
+
+def test_a_backslash_is_escaped_so_spellings_differ_from_escapes() -> None:
+    backslash = chr(92)
+    _, _, escape = _run("US", chr(27))
+    _, _, spelled = _run("US", backslash + "x1b")
+    assert escape == "invalid: " + backslash + "x1b\n"
+    assert spelled == "invalid: " + backslash * 2 + "x1b\n"
+
+
+class _ClosedPipe(io.StringIO):
+    def write(self, text: str) -> int:
+        raise BrokenPipeError
+
+
+def test_a_closed_output_pipe_stops_quietly() -> None:
+    err = io.StringIO()
+    assert main(["US", "90210", "10001"], io.StringIO(), _ClosedPipe(), err) == 1
+    assert err.getvalue() == ""
+
+
+def test_stdin_is_processed_line_by_line() -> None:
+    out = io.StringIO()
+
+    def lines() -> object:
+        yield "90210\n"
+        assert out.getvalue() == "90210\n", "the first code was not written yet"
+        yield "10001\n"
+
+    stdin = lines()
+    assert main(["US"], stdin, out, io.StringIO()) == 0  # type: ignore[arg-type]
+    assert out.getvalue() == "90210\n10001\n"
+
+
+def test_piped_stdin_is_read_as_utf8_whatever_the_console_code_page() -> None:
+    env = {k: v for k, v in os.environ.items() if not k.startswith(("PYTHONUTF8", "PYTHONIO"))}
+    env["PYTHONPATH"] = str(SRC)
+    data = (
+        "\ufeff\uff11\uff15\uff14\uff0d\uff10\uff10\uff12\uff13\r\n\u0661\u0660\u0661\u0661\u0665\n"
+    )
+    result = subprocess.run(
+        [sys.executable, "-m", "postalcheck", "JP"],
+        input=data.encode("utf-8"),
+        capture_output=True,
+        check=False,
+        env=env,
+    )
+    assert result.returncode == 1
+    assert result.stdout.splitlines() == [b"154-0023"]
+    assert result.stderr.splitlines() == [rb"invalid: \u0661\u0660\u0661\u0661\u0665"]
+
+
+def test_a_reader_that_goes_away_leaves_no_traceback() -> None:
+    env = {**os.environ, "PYTHONPATH": str(SRC)}
+    with subprocess.Popen(
+        [sys.executable, "-m", "postalcheck", "US"],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=env,
+    ) as process:
+        assert process.stdin is not None and process.stdout is not None
+        assert process.stderr is not None
+        process.stdout.close()
+        # The command stops at the first failed write, so it may close its end first.
+        with contextlib.suppress(OSError):
+            process.stdin.write(b"90210\n" * 200_000)
+            process.stdin.close()
+        err = process.stderr.read()
+        assert process.wait(timeout=60) == 1
+    assert err == b""

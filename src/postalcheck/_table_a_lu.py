@@ -32,7 +32,7 @@ RULES_A_LU: dict[str, Rule] = {
     "AC": rule(r"ASCN1ZZ", "ASCN 1ZZ", tail(" ", 3)),
     "AD": rule(r"AD[1-7]0\d", "AD100"),
     "AF": digits(4, "1001"),
-    "AI": rule(r"(?:AI)?2640", "2640", drop_prefix("AI"), extra=(2,)),
+    "AI": rule(r"(?:AI)?2640", "2640", drop_prefix("AI"), (2,), "AI"),
     "AL": digits(4, "1001"),
     "AM": rule(r"(?:37)?\d{4}", "375010"),
     # Argentina: the eight-character CPA, plus the four-digit code it extends, which is

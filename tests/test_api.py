@@ -43,7 +43,8 @@ def test_a_country_without_postal_codes_says_so() -> None:
 
 def test_errors_survive_pickling() -> None:
     invalid = pickle.loads(pickle.dumps(InvalidPostalCodeError("DE", "x")))
-    assert (invalid.country, invalid.code, str(invalid)) == ("DE", "x", str(invalid))
+    assert (invalid.country, invalid.code) == ("DE", "x")
+    assert str(invalid) == "'x' is not a valid DE postal code"
     unknown = pickle.loads(pickle.dumps(UnknownCountryError("HK", False)))
     assert (unknown.country, unknown.has_postal_codes) == ("HK", False)
     assert str(unknown) == "'HK' does not use postal codes"

@@ -19,6 +19,7 @@ class Rule:
     example: str
     layout: Layout
     extra_cuts: frozenset[int]
+    extra_prefix: str
 
     def matches(self, compact: str) -> bool:
         return self.pattern.fullmatch(compact) is not None
@@ -35,7 +36,10 @@ class Rule:
                     cuts.add(kept)
                 else:
                     kept += 1
-        return frozenset(cuts) | self.extra_cuts
+        # Extra positions belong to an optional prefix (AI-, PC ): never inside a bare code.
+        if compact.startswith(self.extra_prefix):
+            cuts |= self.extra_cuts
+        return frozenset(cuts)
 
 
 def plain(code: str) -> str:
@@ -92,8 +96,15 @@ def british(code: str) -> str:
     return split_letters(code) if code.startswith("BFPO") else f"{code[:-3]} {code[-3:]}"
 
 
-def rule(pattern: str, example: str, layout: Layout = plain, extra: tuple[int, ...] = ()) -> Rule:
-    return Rule(re.compile(pattern, re.ASCII), example, layout, frozenset(extra))
+def rule(
+    pattern: str,
+    example: str,
+    layout: Layout = plain,
+    extra: tuple[int, ...] = (),
+    extra_prefix: str = "",
+) -> Rule:
+    compiled = re.compile(pattern, re.ASCII)
+    return Rule(compiled, example, layout, frozenset(extra), extra_prefix)
 
 
 def digits(count: int, example: str) -> Rule:

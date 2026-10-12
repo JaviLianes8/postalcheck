@@ -8,7 +8,6 @@ import pytest
 from upstream import EIRCODE_KEYS
 
 from postalcheck import is_valid, normalize
-from postalcheck._countries import RULES
 
 
 def _routing_keys() -> list[str]:
@@ -42,7 +41,3 @@ def test_d6w_is_the_only_routing_key_ending_in_a_letter() -> None:
 def test_the_letter_o_is_never_used(code: str) -> None:
     assert not is_valid("IE", code)
     assert is_valid("IE", code.replace("O", "0").replace("065", "A65"))
-
-
-def test_the_pattern_is_documented_in_the_table() -> None:
-    assert "D6W" in RULES["IE"].pattern.pattern

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from postalcheck import is_valid, normalize
+from postalcheck import UnknownCountryError, is_valid, normalize
 
 
 @pytest.mark.parametrize(
@@ -113,3 +113,12 @@ def test_code_must_be_a_string() -> None:
 def test_country_must_be_a_string() -> None:
     with pytest.raises(TypeError, match="country must be a str"):
         is_valid(None, "90210")  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize("country", ["\u0131t", "\u017fe", "\u00df", "\ufb05", "\uff27\uff22"])
+def test_non_ascii_country_codes_are_unknown(country: str) -> None:
+    # str.upper() would turn these into IT, SE, SS, ST and nothing: none may match.
+    with pytest.raises(UnknownCountryError) as caught:
+        is_valid(country, "00144")
+    assert caught.value.has_postal_codes is None
+    assert caught.value.country == country

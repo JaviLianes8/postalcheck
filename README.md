@@ -33,8 +33,11 @@ print(normalize("UK", "m1 1aa"))  # M1 1AA
 
 Case does not matter. Full-width forms (what Japanese and Chinese keyboards type), decimal
 digits of any script, Unicode dashes and non-breaking spaces are folded to plain ASCII.
-Spaces and dashes are optional and interchangeable, but only where the country writes a
-separator, so a typo does not slip through:
+Spaces (including tabs and no-break spaces) and dashes are optional and interchangeable,
+but only where the country writes a separator, or where libaddressinput allows an optional
+one (France `75 008`, Brunei `BT 2328`, and after the `AI-` and `PC ` prefixes of Anguilla
+and Oman). So a typo does not slip through. Line breaks and control characters are never
+separators.
 
 ```python
 from postalcheck import is_valid, normalize
@@ -69,8 +72,10 @@ except UnknownCountryError as error:
 `example` returns a real code in canonical layout, handy as a form placeholder.
 `UnknownCountryError.has_postal_codes` is `False` for the 70 countries and territories that
 do not use postal codes (Hong Kong, Qatar, Panama, ...), so a form can hide the field, and
-`None` for a code that is not a country. Both errors subclass `ValueError`, keep their
-inputs as attributes (`country`, `code`) and survive pickling.
+`None` for a code that is not a country (including any country string that is not ASCII).
+Both errors subclass `ValueError` and survive pickling. `UnknownCountryError.country` is the
+country as given; `InvalidPostalCodeError.country` is the resolved ISO code (`GB` for
+`uk`) and `.code` the code as given.
 
 ### Command line
 
@@ -81,7 +86,8 @@ M1 1AA
 invalid: QQ1 1AA
 ```
 
-With no code after the country, codes are read from standard input, one per line. The exit
+With no code after the country, codes are read from standard input as UTF-8 (a byte order
+mark is ignored), one per line, and each result is written as soon as it is read. The exit
 status is 1 when any code is invalid and 2 for an unknown country. `python -m postalcheck`
 does the same.
 
@@ -104,9 +110,10 @@ an argument that is not a `str`. Country codes are ISO 3166-1 alpha-2, case-inse
 
 Each rule transcribes the `zip` pattern of the country in Google libaddressinput
 (https://chromium-i18n.appspot.com/ssl-address/data), fetched on 2026-10-12. The test suite
-carries that data unchanged and proves, for every country, that each published example
-validates and keeps its layout, that every string the upstream pattern accepts is accepted
-here, and that every canonical form produced here is accepted upstream.
+carries that data unchanged and checks, for every country, that each published example
+validates and keeps its layout, and, on 400 random strings each, that what the upstream
+pattern accepts is accepted here, that every canonical form produced here is accepted
+upstream, and that on near misses both agree, separator positions included.
 
 Four deliberate differences:
 

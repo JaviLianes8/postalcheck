@@ -24,6 +24,9 @@ from postalcheck import is_valid, normalize
         ("CA", "K1A\u30000B1", "K1A 0B1"),
         ("CA", "  k1a   0b1\t", "K1A 0B1"),
         ("US", "12345 - 6789", "12345-6789"),
+        ("PL", "00\ufe63950", "00-950"),
+        ("PL", "00\u00ad950", "00-950"),
+        ("DE", "10115\r\n", "10115"),
     ],
 )
 def test_input_is_folded_to_ascii(country: str, code: str, normal: str) -> None:
@@ -43,6 +46,10 @@ def test_input_is_folded_to_ascii(country: str, code: str, normal: str) -> None:
         ("US", "   "),
         ("US", " - "),
         ("NL", "1234 \u00c5B"),
+        ("GB", "SW1A\n1AA"),  # line breaks and control characters are not separators
+        ("GB", "SW1A\x1f1AA"),
+        ("GB", "SW1A\x0b1AA"),
+        ("GB", "SW1A\u20281AA"),
     ],
 )
 def test_other_characters_are_refused(country: str, code: str) -> None:
@@ -63,6 +70,10 @@ def test_other_characters_are_refused(country: str, code: str) -> None:
         ("BR", "0131-0100"),
         ("FR", "750 08"),
         ("OM", "1 33"),
+        ("OM", "13 3"),  # the extra position belongs to the PC prefix only
+        ("OM", "13-3"),
+        ("AI", "26-40"),  # and to the AI prefix only
+        ("AI", "26 40"),
     ],
 )
 def test_separators_only_where_the_country_writes_one(country: str, code: str) -> None:

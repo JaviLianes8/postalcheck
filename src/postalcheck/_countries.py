@@ -21,5 +21,10 @@ ALIASES = {"UK": "GB"}
 
 
 def country_key(country: str) -> str:
-    key = country.strip().upper()
+    """The ISO key for ``country``; non-ASCII input gives a key that matches nothing."""
+    key = country.strip()
+    # str.upper() turns some non-ASCII letters into ASCII ones (dotless i, long s, sharp s).
+    if not key.isascii():
+        return ""
+    key = key.upper()
     return ALIASES.get(key, key)

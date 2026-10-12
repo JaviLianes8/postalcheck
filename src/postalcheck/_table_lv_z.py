@@ -50,7 +50,7 @@ RULES_LV_Z: dict[str, Rule] = {
     "NO": digits(4, "0025"),
     "NP": digits(5, "44601"),
     "NZ": digits(4, "6001"),
-    "OM": rule(r"(?:PC)?\d{3}", "133", drop_prefix("PC"), extra=(2,)),
+    "OM": rule(r"(?:PC)?\d{3}", "133", drop_prefix("PC"), (2,), "PC"),
     "PE": rule(r"LIMA\d{1,2}|CALLAO0?\d|[0-2]\d{4}", "LIMA 23", split_letters),
     "PF": rule(r"987\d{2}", "98709"),
     "PG": digits(3, "111"),

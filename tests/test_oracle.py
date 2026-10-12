@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import itertools
 import random
+import re
 
 import pytest
 from upstream import sample, upstream_pattern, zip_countries
@@ -10,7 +12,7 @@ from upstream import sample, upstream_pattern, zip_countries
 from postalcheck import is_valid, normalize
 from postalcheck._countries import RULES
 
-ROUNDS = 300
+ROUNDS = 400
 # Ireland is stricter than libaddressinput (routing key letters, no letter O).
 STRICTER = {"IE"}
 # Argentina also accepts the four-digit code that the CPA extends.
@@ -55,6 +57,15 @@ def test_every_normal_form_is_accepted_upstream(country: str) -> None:
         assert upstream.fullmatch(normal), (country, compact, normal)
 
 
+def _spellings(code: str) -> set[str]:
+    """Every way to write ``code`` with each run of separators as one space or one dash."""
+    parts = re.split(r"[ -]+", code.strip().upper())
+    return {
+        "".join(p + s for p, s in zip(parts, (*seps, ""), strict=True))
+        for seps in itertools.product(" -", repeat=len(parts) - 1)
+    }
+
+
 @pytest.mark.parametrize("country", zip_countries())
 def test_near_misses_agree_with_upstream(country: str) -> None:
     rng = random.Random(country)
@@ -65,5 +76,9 @@ def test_near_misses_agree_with_upstream(country: str) -> None:
             normal = normalize(country, code)
             legacy = country in LOOSER and normal.isdigit() and len(normal) == 4
             assert legacy or upstream.fullmatch(normal), (country, code)
+            # Separators may be left out, but those given sit where upstream writes one.
+            if re.search(r"[ -]", code.strip()):
+                spelled = any(upstream.fullmatch(s) for s in _spellings(code))
+                assert legacy or spelled, (country, code)
         if upstream.fullmatch(code) and country not in STRICTER:
             assert is_valid(country, code), (country, code)
