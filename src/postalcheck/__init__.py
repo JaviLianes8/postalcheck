@@ -5,7 +5,7 @@ from __future__ import annotations
 from ._core import example, is_valid, normalize, supported_countries
 from ._errors import InvalidPostalCodeError, UnknownCountryError
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 __all__ = [
     "InvalidPostalCodeError",

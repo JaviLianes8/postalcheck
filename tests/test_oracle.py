@@ -7,9 +7,9 @@ import random
 import re
 
 import pytest
-from upstream import sample, upstream_pattern, zip_countries
+from upstream import sample, upstream_pattern
 
-from postalcheck import is_valid, normalize
+from postalcheck import is_valid, normalize, supported_countries
 from postalcheck._countries import RULES
 
 ROUNDS = 400
@@ -31,7 +31,7 @@ def _mutate(code: str, rng: random.Random) -> str:
     return code[:at] + code[at + 1 :]
 
 
-@pytest.mark.parametrize("country", zip_countries())
+@pytest.mark.parametrize("country", supported_countries())
 def test_whatever_upstream_accepts_is_accepted(country: str) -> None:
     rng = random.Random(country)
     upstream = upstream_pattern(country).pattern
@@ -43,7 +43,7 @@ def test_whatever_upstream_accepts_is_accepted(country: str) -> None:
         assert is_valid(country, code.lower()), (country, code)
 
 
-@pytest.mark.parametrize("country", zip_countries())
+@pytest.mark.parametrize("country", supported_countries())
 def test_every_normal_form_is_accepted_upstream(country: str) -> None:
     rng = random.Random(country)
     upstream = upstream_pattern(country)
@@ -66,7 +66,7 @@ def _spellings(code: str) -> set[str]:
     }
 
 
-@pytest.mark.parametrize("country", zip_countries())
+@pytest.mark.parametrize("country", supported_countries())
 def test_near_misses_agree_with_upstream(country: str) -> None:
     rng = random.Random(country)
     upstream = upstream_pattern(country)

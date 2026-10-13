@@ -1,0 +1,21 @@
+{
+  "libaddressinput.jsonl": {
+    "title": "Google libaddressinput address metadata, one response body per country key",
+    "index": "https://chromium-i18n.appspot.com/ssl-address/data",
+    "index_field": "countries",
+    "revision": "service snapshot of 2026-10-12 (the service is not versioned)",
+    "fetched": "2026-10-12",
+    "size": 94508,
+    "sha256": "f2417db82d928fe0b19c557ca97fd321f6498dfc775d6338e990f1b1981bc112",
+    "licence": "not stated by the data service (the libaddressinput library is Apache-2.0)"
+  },
+  "eircode-routing-keys.wiki": {
+    "title": "Wikipedia, List of Eircode routing areas in Ireland (wikitext)",
+    "url": "https://en.wikipedia.org/w/index.php?oldid=1348214965&action=raw",
+    "revision": "oldid 1348214965 (2026-04-11)",
+    "fetched": "2026-10-12",
+    "size": 12010,
+    "sha256": "e5d46fe105832ebda145cc9bb538c4b5a041332d1587f7fbc26634e7d1e7dcbb",
+    "licence": "CC BY-SA 4.0, Wikipedia contributors"
+  }
+}

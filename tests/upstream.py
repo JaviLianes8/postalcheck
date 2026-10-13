@@ -1,7 +1,13 @@
-"""The pinned libaddressinput data and a sampler that writes strings a pattern accepts."""
+"""The pinned libaddressinput data and a sampler that writes strings a pattern accepts.
+
+The third-party files are not committed: `python scripts/fetch_upstream.py` fetches them
+into tests/upstream/. Tests that need them skip while a file is absent and fail if it
+differs from tests/upstream/MANIFEST.json.
+"""
 
 from __future__ import annotations
 
+import hashlib
 import importlib
 import json
 import random
@@ -10,11 +16,21 @@ from functools import cache
 from pathlib import Path
 from typing import Any
 
-DATA = Path(__file__).resolve().parent / "data"
-LIBADDRESSINPUT = DATA / "libaddressinput.jsonl"
-LIBADDRESSINPUT_SHA256 = "f2417db82d928fe0b19c557ca97fd321f6498dfc775d6338e990f1b1981bc112"
-EIRCODE_KEYS = DATA / "eircode-routing-keys.wiki"
-EIRCODE_KEYS_SHA256 = "e5d46fe105832ebda145cc9bb538c4b5a041332d1587f7fbc26634e7d1e7dcbb"
+import pytest
+
+FOLDER = Path(__file__).resolve().parent / "upstream"
+
+
+def read_upstream(name: str) -> str:
+    """Return a fetched third-party file, or skip the calling test when it is absent."""
+    path = FOLDER / name
+    if not path.is_file():
+        pytest.skip(f"{name} is not fetched; run python scripts/fetch_upstream.py")
+    entry = json.loads((FOLDER / "MANIFEST.json").read_text(encoding="utf-8"))[name]
+    body = path.read_bytes()
+    assert hashlib.sha256(body).hexdigest() == entry["sha256"], f"{name} differs from MANIFEST"
+    return body.decode("utf-8")
+
 
 # Python 3.11 moved the regular expression parser to a private module.
 try:
@@ -26,8 +42,13 @@ except ImportError:  # pragma: no cover - Python 3.10
 @cache
 def records() -> dict[str, dict[str, str]]:
     """Every country record, keyed by its ISO code, exactly as fetched."""
-    lines = LIBADDRESSINPUT.read_text(encoding="utf-8").splitlines()
+    lines = read_upstream("libaddressinput.jsonl").splitlines()
     return {record["key"]: record for record in map(json.loads, lines)}
+
+
+def eircode_page() -> str:
+    """The pinned Wikipedia wikitext listing the Eircode routing keys."""
+    return read_upstream("eircode-routing-keys.wiki")
 
 
 def zip_countries() -> list[str]:
