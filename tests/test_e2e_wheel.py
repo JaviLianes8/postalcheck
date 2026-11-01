@@ -126,7 +126,8 @@ def test_installed_wheel_end_to_end(tmp_path: Path, wheel: Path, distribution: s
     unknown = _run(python, "-m", "postalcheck", "ZZ", cwd=work)
     assert unknown.returncode == 2
     for command in ([str(script)], [str(python), "-I", "-m", "postalcheck"]):
-        asyncio.run(check_streaming(command, work))
+        for invalid_first in (False, True):
+            asyncio.run(check_streaming(command, work, invalid_first=invalid_first))
 
 
 @pytest.mark.skipif(os.environ.get("POSTALCHECK_PYPI") != "1", reason="set POSTALCHECK_PYPI=1")

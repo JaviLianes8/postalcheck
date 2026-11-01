@@ -34,6 +34,17 @@ def test_multicharacter_width_folding_is_invalid(country: str) -> None:
         assert (caught.value.country, caught.value.code) == (country, code)
 
 
+@pytest.mark.parametrize("country", supported_countries())
+def test_multicharacter_width_folding_is_invalid_inside_codes(country: str) -> None:
+    compact = example(country).replace(" ", "").replace("-", "")
+    for position in range(1, len(compact)):
+        code = compact[:position] + "\uffe3" + compact[position:]
+        assert is_valid(country, code) is False
+        with pytest.raises(InvalidPostalCodeError) as caught:
+            normalize(country, code)
+        assert (caught.value.country, caught.value.code) == (country, code)
+
+
 @pytest.mark.parametrize("space", WHITESPACE)
 @pytest.mark.parametrize("operation", [example, is_valid, normalize])
 def test_country_unicode_whitespace(space: str, operation: Callable[..., object]) -> None:

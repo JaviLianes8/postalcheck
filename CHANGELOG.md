@@ -47,6 +47,9 @@ All notable changes to this project are documented here. The format follows
 - Runnable public docstrings, a detailed guide, stronger contracts and seeded hostile-input
   tests, installed-wheel and PyPI upgrade checks, and release validation metadata.
 - `POSTALCHECK_UPSTREAM` selects a separate local folder for fetched test data.
+- Regression contracts reject embedded U+FFE3 at every internal position, require streamed
+  CLI results after invalid input, and pin FAQ character references, Unicode whitespace
+  and text around nested divs. These tests preserve the existing behavior.
 
 ## [0.2.1] - 2026-10-13
 
