@@ -52,7 +52,7 @@ print("e2e ok")
 
 def _run(*cmd: str | Path, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        [str(c) for c in cmd], cwd=cwd, capture_output=True, text=True, check=False
+        [str(c) for c in cmd], cwd=cwd, capture_output=True, text=True, check=False, timeout=240
     )
 
 
@@ -88,6 +88,10 @@ def test_installed_wheel_end_to_end(tmp_path: Path) -> None:
 
     script = bindir / ("postalcheck.exe" if sys.platform == "win32" else "postalcheck")
     cli = _run(script, "gb", "sw1a1aa", "QQ1 1AA", cwd=work)
-    assert (cli.returncode, cli.stdout, cli.stderr) == (1, "SW1A 1AA\n", "invalid: QQ1 1AA\n")
+    assert (cli.returncode, cli.stdout, cli.stderr) == (
+        1,
+        "SW1A 1AA\n",
+        "invalid postal code format\n",
+    )
     unknown = _run(python, "-m", "postalcheck", "ZZ", cwd=work)
     assert unknown.returncode == 2

@@ -1,7 +1,9 @@
 # postalcheck
 
-Validate and normalize postal and ZIP codes for the 182 countries and territories that use
-them. Every rule is checked against the address data that Chrome and Android use for their
+[![Lianes8 Certified](https://lianes8studio.com/certified/lianes8-certified-badge.svg)](https://lianes8studio.com/certified)
+
+Check and normalize postal and ZIP code formats for 182 countries and territories.
+This is a format check, not proof that a code is assigned or an address is deliverable. Every rule is checked against the address data that Chrome and Android use for their
 address forms (Google libaddressinput). Zero dependencies, fully typed.
 
 ## Install
@@ -26,7 +28,7 @@ print(normalize("LV", "1073"))  # LV-1073
 print(normalize("UK", "m1 1aa"))  # M1 1AA
 ```
 
-`normalize` returns the code in the layout the national postal operator prints, and raises
+`normalize` returns the code in the bundled canonical layout, and raises
 `InvalidPostalCodeError` when `is_valid` would return `False`.
 
 ### What the input may look like
@@ -66,12 +68,13 @@ except UnknownCountryError as error:
 try:
     normalize("ZZ", "12345")
 except UnknownCountryError as error:
-    print(error)  # 'ZZ' is not a supported country code
+    print(error)  # unsupported country code
 ```
 
-`example` returns a real code in canonical layout, handy as a form placeholder.
+`example` returns a source example in canonical layout, handy as a form placeholder,
+without a current assignment guarantee.
 `UnknownCountryError.has_postal_codes` is `False` for the 70 countries and territories that
-do not use postal codes (Hong Kong, Qatar, Panama, ...), so a form can hide the field, and
+have no postal-code format in the source snapshot (Hong Kong, Qatar, Panama, ...), so a form can hide the field, and
 `None` for a code that is not a country (including any country string that is not ASCII).
 Both errors subclass `ValueError` and survive pickling. `UnknownCountryError.country` is the
 country as given; `InvalidPostalCodeError.country` is the resolved ISO code (`GB` for
@@ -83,7 +86,7 @@ country as given; `InvalidPostalCodeError.country` is the resolved ISO code (`GB
 $ postalcheck gb "sw1a1aa" "m1 1aa" "QQ1 1AA"
 SW1A 1AA
 M1 1AA
-invalid: QQ1 1AA
+invalid postal code format
 ```
 
 With no code after the country, codes are read from standard input as UTF-8 (a byte order
@@ -95,22 +98,22 @@ does the same.
 
 | Name | Promise |
 | --- | --- |
-| `is_valid(country, code)` | `True` when `code` is a valid postal code of `country` |
+| `is_valid(country, code)` | `True` when `code` matches the format for `country` |
 | `normalize(country, code)` | The canonical layout, or `InvalidPostalCodeError` |
-| `example(country)` | A real code of `country` in canonical layout |
+| `example(country)` | A source example of `country` in canonical layout |
 | `supported_countries()` | The 182 ISO codes with a rule, sorted |
 | `UnknownCountryError` | No rule for the country; `has_postal_codes` says why |
 | `InvalidPostalCodeError` | The code does not match; keeps `country` and `code` |
 
-All functions raise `UnknownCountryError` for a country without a rule and `TypeError` for
-an argument that is not a `str`. Country codes are ISO 3166-1 alpha-2, case-insensitive;
+Functions that take a country raise `UnknownCountryError` for a country without a rule and `TypeError` for
+an argument that is not a `str`. Country keys follow libaddressinput (including exceptional AC, TA and XK), case-insensitive;
 `UK` is read as `GB`.
 
 ## Where the rules come from
 
 Each rule transcribes the `zip` pattern of the country in Google libaddressinput
-(https://chromium-i18n.appspot.com/ssl-address/data), fetched on 2026-10-12. The test suite
-carries that data unchanged and checks, for every country, that each published example
+(https://chromium-i18n.appspot.com/ssl-address/data), re-fetched for 1.0.0 on 2026-11-01. The optional tests fetch
+that data separately, verify its manifest hashes and check, for every country, that each published example
 validates and keeps its layout, and, on 400 random strings each, that what the upstream
 pattern accepts is accepted here, that every canonical form produced here is accepted
 upstream, and that on near misses both agree, separator positions included.
@@ -122,11 +125,12 @@ Four deliberate differences:
   states (https://www.eircode.ie/faqs).
 - **Argentina** also accepts the four-digit code that the eight-character CPA extends.
 - **Latvia** accepts the bare digits and normalizes them to the `LV-` form.
-- **Sweden** normalizes to `114 55`, the PostNord layout, where libaddressinput lists
+- **Sweden** normalizes to `114 55`, the [UPU Sweden layout](https://www.upu.int/UPU/media/upu/PostalEntitiesFiles/addressingUnit/sweEn.pdf),
+  where libaddressinput lists
   `11455`.
 
-This checks the format, not whether a code is assigned: that needs the national address
-files, which are large, licensed and change every month.
+This checks the bundled formats, including some legacy forms. For current assignment
+or deliverability, consult the relevant postal operator.
 
 ### Countries
 
@@ -196,15 +200,21 @@ files, which are large, licensed and change every month.
 
 ## Why
 
-Most validators carry a short list of countries written from memory. They accept codes
-that cannot exist and refuse real ones (the 0.1.0 table of this package refused every
-Latvian and new Vietnamese code). Address libraries that get it right pull in native
-libraries or runtime dependencies. `postalcheck` is one small typed package with every
-country that uses postal codes, proven against the data that browsers use.
+If you only need one country, a carefully sourced regular expression may be enough.
+`postalcheck` adds Unicode input folding, separator placement, canonical layouts and a
+consistent typed API across 182 source-defined formats without runtime dependencies.
+For whole-address validation and address-entry forms, consider
+[Google libaddressinput](https://github.com/google/libaddressinput), which provides
+C++ and Java libraries for those broader tasks (source checked 2026-11-01).
+Neither a format pattern nor this library proves delivery is possible.
+
+See the [guide](https://github.com/JaviLianes8/postalcheck/blob/main/GUIDE.md) for exact
+input, error and upgrade contracts, and the
+[changelog](https://github.com/JaviLianes8/postalcheck/blob/main/CHANGELOG.md) for release changes.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](https://github.com/JaviLianes8/postalcheck/blob/main/LICENSE).
 
 ## Links
 

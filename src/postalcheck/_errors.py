@@ -8,13 +8,21 @@ class UnknownCountryError(ValueError):
 
     ``has_postal_codes`` is ``False`` for a real country or territory that does not use
     postal codes (such as ``"HK"``), and ``None`` when the code is not a known country.
+    ``country`` retains the original input; messages never include input values.
+
+    >>> from postalcheck import UnknownCountryError
+    >>> error = UnknownCountryError("HK", False)
+    >>> error.country, error.has_postal_codes
+    ('HK', False)
     """
+
+    __module__ = "postalcheck"
 
     def __init__(self, country: str, has_postal_codes: bool | None = None) -> None:
         if has_postal_codes is False:
-            message = f"{country!r} does not use postal codes"
+            message = "country does not use postal codes"
         else:
-            message = f"{country!r} is not a supported country code"
+            message = "unsupported country code"
         super().__init__(message)
         self.country = country
         self.has_postal_codes = has_postal_codes
@@ -24,10 +32,20 @@ class UnknownCountryError(ValueError):
 
 
 class InvalidPostalCodeError(ValueError):
-    """The code does not match its country's format. Keeps ``country`` and ``code``."""
+    """The code does not match its country's format. Keeps ``country`` and ``code``.
+
+    Messages never include input values. Both attributes survive pickling.
+
+    >>> from postalcheck import InvalidPostalCodeError
+    >>> error = InvalidPostalCodeError("US", "bad")
+    >>> error.country, error.code
+    ('US', 'bad')
+    """
+
+    __module__ = "postalcheck"
 
     def __init__(self, country: str, code: str) -> None:
-        super().__init__(f"{code!r} is not a valid {country} postal code")
+        super().__init__("invalid postal code format")
         self.country = country
         self.code = code
 

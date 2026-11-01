@@ -3,8 +3,8 @@
     "title": "Google libaddressinput address metadata, one response body per country key",
     "index": "https://chromium-i18n.appspot.com/ssl-address/data",
     "index_field": "countries",
-    "revision": "service snapshot of 2026-10-12 (the service is not versioned)",
-    "fetched": "2026-10-12",
+    "revision": "service snapshot of 2026-11-01 (identical to 2026-10-12)",
+    "fetched": "2026-11-01",
     "size": 94508,
     "sha256": "f2417db82d928fe0b19c557ca97fd321f6498dfc775d6338e990f1b1981bc112",
     "licence": "not stated by the data service (the libaddressinput library is Apache-2.0)"
@@ -13,9 +13,33 @@
     "title": "Wikipedia, List of Eircode routing areas in Ireland (wikitext)",
     "url": "https://en.wikipedia.org/w/index.php?oldid=1348214965&action=raw",
     "revision": "oldid 1348214965 (2026-04-11)",
-    "fetched": "2026-10-12",
+    "fetched": "2026-11-01",
     "size": 12010,
     "sha256": "e5d46fe105832ebda145cc9bb538c4b5a041332d1587f7fbc26634e7d1e7dcbb",
     "licence": "CC BY-SA 4.0, Wikipedia contributors"
+  },
+  "eircode-faq.html": {
+    "url": "https://www.eircode.ie/faqs",
+    "fetched": "2026-11-01",
+    "revision": "live snapshot",
+    "size": 215611,
+    "sha256": "bd588d4fa61252937b45ac2ad1f7ac86867e3e50673f492c0d6c885e5296bd12",
+    "licence": "Eircode website copyright; local verification only"
+  },
+  "libaddressinput-readme.md": {
+    "url": "https://raw.githubusercontent.com/google/libaddressinput/master/README.md",
+    "fetched": "2026-11-01",
+    "revision": "live snapshot",
+    "size": 1769,
+    "sha256": "5365994d99d825e9225199abebde333d34505fdab9be7952d6be46a96bde3518",
+    "licence": "Apache-2.0"
+  },
+  "sweden.pdf": {
+    "url": "https://www.upu.int/UPU/media/upu/PostalEntitiesFiles/addressingUnit/sweEn.pdf",
+    "revision": "11/2024",
+    "fetched": "2026-11-01",
+    "size": 109990,
+    "sha256": "f91a01689813522df9e00caadda573abdff6d1d9082d1941b90eec93f3bf822b",
+    "licence": "UPU copyright; local verification only"
   }
 }

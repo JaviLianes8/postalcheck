@@ -6,6 +6,32 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-01
+
+### Stable
+
+- The six public names, signatures and defaults from 0.2.1, the 182 bundled formats,
+  Unicode folding, canonical layouts, UK alias and error attributes are retained.
+- Python 3.10 through 3.14, zero runtime dependencies, and packaged type information.
+
+### Changed
+
+- Exception messages and CLI diagnostics no longer echo input values. Invalid codes
+  report `invalid postal code format`; unknown countries report `unsupported country
+  code` or `country does not use postal codes`. CLI usage errors report `invalid
+  arguments; use --help`. Attributes retain the original inputs for deliberate access.
+- Non-string arguments still raise `TypeError`, but messages omit the type name.
+- Error classes identify their public module as `postalcheck` for new pickles. Existing
+  0.2.1 pickles still load; new pickles also load in 0.2.1.
+- String subclasses use the underlying string value instead of overridden `strip` methods.
+- CLI closed-pipe handling uses an in-memory output replacement, retaining exit status 1.
+
+### Added
+
+- Runnable public docstrings, a detailed guide, stronger contracts and seeded hostile-input
+  tests, installed-wheel and PyPI upgrade checks, and release validation metadata.
+- `POSTALCHECK_UPSTREAM` selects a separate local folder for fetched test data.
+
 ## [0.2.1] - 2026-10-13
 
 ### Changed

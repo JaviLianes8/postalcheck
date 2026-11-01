@@ -15,12 +15,14 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import sys
 import urllib.request
 from pathlib import Path
 from typing import Any
 
 FOLDER = Path(__file__).resolve().parents[1] / "tests" / "upstream"
+DESTINATION = Path(os.environ.get("POSTALCHECK_UPSTREAM", str(FOLDER)))
 
 
 def _get(url: str) -> bytes:
@@ -37,6 +39,7 @@ def _assemble(entry: dict[str, Any]) -> bytes:
 
 
 def main() -> int:
+    DESTINATION.mkdir(parents=True, exist_ok=True)
     manifest = json.loads((FOLDER / "MANIFEST.json").read_text(encoding="utf-8"))
     failed = 0
     for name, entry in manifest.items():
@@ -46,7 +49,7 @@ def main() -> int:
             print(f"{name}: got {len(body)} bytes, sha256 {digest}; manifest differs")
             failed += 1
             continue
-        (FOLDER / name).write_bytes(body)
+        (DESTINATION / name).write_bytes(body)
         print(f"{name}: ok")
     return 1 if failed else 0
 

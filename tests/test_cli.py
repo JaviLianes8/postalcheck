@@ -28,30 +28,34 @@ def test_invalid_codes_go_to_stderr_and_set_status_one() -> None:
     assert _run("US", "90210", "9021", "12345-6789") == (
         1,
         "90210\n12345-6789\n",
-        "invalid: 9021\n",
+        "invalid postal code format\n",
     )
 
 
 def test_codes_are_read_from_stdin_skipping_blank_lines() -> None:
-    assert _run("NL", stdin="1234ab\r\n\n  \n0000 AA\n") == (1, "1234 AB\n", "invalid: 0000 AA\n")
+    assert _run("NL", stdin="1234ab\r\n\n  \n0000 AA\n") == (
+        1,
+        "1234 AB\n",
+        "invalid postal code format\n",
+    )
 
 
 def test_an_unknown_country_is_a_usage_error_even_without_codes() -> None:
     status, out, err = _run("HK")
     assert (status, out) == (2, "")
-    assert err.startswith("postalcheck: 'HK' does not use postal codes\nsupported: AC AD ")
+    assert err.startswith("postalcheck: country does not use postal codes\nsupported: AC AD ")
 
 
-def test_echoed_input_is_escaped() -> None:
+def test_invalid_input_is_not_echoed() -> None:
     status, _, err = _run("US", "\x1b[2J9021\n\u202e")
     assert status == 1
-    assert err == r"invalid: \x1b[2J9021\n\u202e" + "\n"
+    assert err == "invalid postal code format" + "\n"
 
 
 def test_usage_errors_and_help_go_to_the_given_streams() -> None:
     status, out, err = _run()
     assert (status, out) == (2, "")
-    assert "the following arguments are required: country" in err
+    assert "invalid arguments; use --help" in err
     status, out, err = _run("--help")
     assert (status, err) == (0, "")
     assert "usage: postalcheck" in out
@@ -70,17 +74,17 @@ def test_python_dash_m_runs_the_command_line() -> None:
         text=True,
         encoding="utf-8",
         check=False,
-        cwd=SRC,
+        cwd=SRC if SRC.exists() else None,
     )
     assert (result.returncode, result.stdout, result.stderr) == (0, "154-0023\n", "")
 
 
-def test_a_backslash_is_escaped_so_spellings_differ_from_escapes() -> None:
+def test_escape_spellings_are_not_echoed() -> None:
     backslash = chr(92)
     _, _, escape = _run("US", chr(27))
     _, _, spelled = _run("US", backslash + "x1b")
-    assert escape == "invalid: " + backslash + "x1b\n"
-    assert spelled == "invalid: " + backslash * 2 + "x1b\n"
+    assert escape == "invalid postal code format\n"
+    assert spelled == "invalid postal code format\n"
 
 
 class _ClosedPipe(io.StringIO):
@@ -122,7 +126,7 @@ def test_piped_stdin_is_read_as_utf8_whatever_the_console_code_page() -> None:
     )
     assert result.returncode == 1
     assert result.stdout.splitlines() == [b"154-0023"]
-    assert result.stderr.splitlines() == [rb"invalid: \u0661\u0660\u0661\u0661\u0665"]
+    assert result.stderr.splitlines() == [b"invalid postal code format"]
 
 
 def test_a_reader_that_goes_away_leaves_no_traceback() -> None:

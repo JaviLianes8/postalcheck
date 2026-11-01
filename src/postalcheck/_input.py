@@ -23,7 +23,7 @@ def split(code: str) -> tuple[str, tuple[int, ...]] | None:
     chars: list[str] = []
     cuts: list[int] = []
     pending = False
-    for ch in code.strip():
+    for ch in str.strip(code):
         if unicodedata.decomposition(ch).startswith(_WIDTH_FORMS):
             ch = unicodedata.normalize("NFKC", ch)
         if ch == "\t" or ch in _DASHES or unicodedata.category(ch) == "Zs":
