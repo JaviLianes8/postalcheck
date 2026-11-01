@@ -10,6 +10,7 @@ Progress:
 - [x] Every available supported interpreter (item 10).
 - [x] Archive inspection and final four gates (items 14-15).
 - [x] Deliberate mutation round (item 18).
+- [x] QA round 1 fixes and regression contracts; independent re-review pending.
 - [ ] Independent reviewer (item 16).
 - [ ] Five independent QA lenses (item 19).
 - [ ] Merge and publication (item 17).
@@ -51,12 +52,49 @@ if files are absent and verify their size and digest if present.
 - https://raw.githubusercontent.com/google/libaddressinput/master/README.md : verified
   the README comparison's C++ and Java implementations and broader address-input scope.
 
-## Independent stages
+## QA round 1 (2026-11-01)
 
-No independent QA lens or reviewer has run on this branch. Items 16 and 19 remain pending.
-Merge and publication are outside this preparation stage.
+All five lenses reported FAIL on `ce67801aacf88dd1f9da9c3645d054a1e8e6575d`.
+Fix commit: `88f4d43709f9fbcc72e5631cc52270e9b7c9e7c1`.
+All 17 findings are addressed locally; independent re-review of each lens remains pending.
+The public API, country formats and canonical layouts are unchanged.
 
-## Packaging and upgrade (items 8, 10, 13, 14)
+| Findings | Changes and contract evidence |
+| --- | --- |
+| A-001, C-002, D1, E-CLI-STREAM | Flush each result inside output-error handling. Real pipes require two results before stdin EOF for both entry points, installed from wheel and sdist. |
+| B-01, C-001 | Reject multi-character width folds. U+FFE3 returns False or InvalidPostalCodeError in all 182 countries; argv and stdin batches continue after rejection. |
+| C-003 | Check actual types without invoking instance hooks. All country/code arguments reject hostile non-strings with safe TypeError messages; string subclasses still work. |
+| A-002 | Correct the historical changelog: Irish routing-key initials and D6W are checked, not membership in the 139-key list. |
+| A-003 | README and changelog apply the ASCII country restriction after Unicode whitespace trimming. |
+| B-02 | Document runtime Unicode database coverage, including Kawi's version dependence; exercise that policy across supported Python versions. |
+| D2 | Hash deterministic FAQ answer text, excluding dynamic HTML fields. Extraction tests accept session changes but reject changed or missing answers. |
+| E-M09 | Exercise all 29 surrounding Unicode whitespace characters across all three country-taking functions, aliases and error metadata. |
+| E-M21, E-M22 | Exercise every documented dash, width variant, tab and Unicode Zs character at every position in ten representative formats, including separator runs. |
+| E-M30, E-M62 | Assert None, False and True metadata, original country, args and messages through construction, copy, deepcopy and pickle protocols 0-5. |
+| E-M56 | Real CLI subprocesses reject malformed UTF-8 embedded inside an otherwise valid code, with no successful output or traceback. |
+
+New contracts ran before production fixes: **203 failed, 408 passed** against the reviewed
+code, including wheel/sdist streaming failures. After fixes, all **609 focused contracts**
+passed. Each of the six reported survivors was injected separately and caught: M09, M21
+and M22 by `test_unicode_contracts.py`, M30 and M62 by `test_error_contracts.py`, and M56
+by `test_cli_contracts.py`. No behavior finding is disputed.
+
+Two fresh complete source fetches passed; a further fetch after validation also passed.
+The FAQ extraction is 29,785 bytes, SHA-256
+`f0880a6395c4f67c9c714613fd7a7ef9e097178227f3bae5b8d6e56560198545`.
+All seven runtime configurations listed below passed **2,100 tests, 4 skipped** each.
+The skips are three opt-in build/upgrade cases and the intentional Ireland oracle case.
+The full suite enabled fetched sources, wheel/sdist installs and the live 0.2.1 upgrade:
+**2,103 passed, 1 skipped in 66.13 seconds**. Each required gate exited 0 independently:
+`ruff format --check .`, `ruff check .`, `mypy --strict src` and `pytest`.
+`mypy --strict src tests` also passed. Each test had a 300-second timeout.
+The 609 new contracts also passed from the extracted sdist against the installed wheel,
+with the source package excluded from the extracted tree.
+Evidence is retained outside the repository in certification scratch folders `fix-r1`
+and `fix-r1-complete`: red/green contracts, six mutation logs, fetches, matrix and gates.
+Items 16 and 19 require independent approval; merge and publication remain pending.
+
+## Preparation packaging and upgrade (items 8, 10, 13, 14)
 
 The build produced an sdist and a wheel built from that sdist. `twine check --strict`
 passed both. Wheel inspection: 16 entries, only the package (including `py.typed`),
@@ -147,7 +185,7 @@ scan. These are session measurements, not a promised throughput threshold.
 | unicode | 0.097752 | 0.335177 | 1.267446 |
 | countries | 0.000083 | 0.000328 | 0.001111 |
 
-## Final gates (item 15)
+## Preparation gates (item 15)
 
 On 2026-11-01, each command exited 0 independently: `ruff format --check .`,
 `ruff check .`, `mypy --strict src`, `mypy --strict src tests` and `pytest`.
@@ -155,28 +193,4 @@ The final suite enabled fetched sources, built-wheel e2e and the live PyPI upgra
 **1,493 passed, 1 skipped in 57.92 seconds**. The only skip is the intentional Ireland
 upstream-permissiveness comparison. All public doctests, README and GUIDE Python blocks,
 CLI transcript and strict consumer typing checks passed. Source/test files remain under
-200 lines. Package source has not changed since `40f250b`.
-
-## Preparation scorecard
-
-| Item | Status | Evidence |
-| --- | --- | --- |
-| 1 | PASS | Six names and signatures retained; all changes listed in CHANGELOG |
-| 2 | PASS | Exact exports and absence of accidental public names tested |
-| 3 | PASS | Every public name has an executed example; README and GUIDE executed |
-| 4 | PASS | Strict typing of src/tests and installed consumers; wheel includes py.typed |
-| 5 | PASS | Typed errors, bounded input-free messages, retained attributes and pickles |
-| 6 | PASS | API, format, Unicode, errors, signatures, CLI and packaging contracts |
-| 7 | PASS | Live sources, 433 source examples, independent regex comparisons |
-| 8 | PASS | Isolated wheel API/CLI consumers and real 0.2.1 upgrade |
-| 9 | PASS | Seeded properties, million-character inputs and scaling measurements |
-| 10 | PASS | Seven available CPython configurations, 3.10 through 3.14 |
-| 11 | PASS | Absolute README links, honest scope/comparison, guide, twine strict |
-| 12 | PASS | 1.0.0 section dated 2026-11-01 |
-| 13 | PASS | Stable 1.0.0 metadata, MIT, project URLs, zero runtime requirements |
-| 14 | PASS | Both archives inspected; license and type marker present; no fetched corpus |
-| 15 | PASS | All four gates independently exit 0 |
-| 16 | PENDING | Independent reviewer has not run |
-| 17 | PENDING | Merge and publication are outside preparation |
-| 18 | PASS | All 24 deliberate mutations caught, restored suite green |
-| 19 | PENDING | Five independent QA lenses have not run |
+200 lines. These preparation results predate QA round 1; updated evidence appears above.
