@@ -9,7 +9,7 @@ from ._rules import Rule
 
 
 def _rule(country: str) -> tuple[str, Rule]:
-    if not isinstance(country, str):
+    if not issubclass(type(country), str):
         raise TypeError("country must be a str")
     key = country_key(country)
     rule = RULES.get(key)
@@ -19,7 +19,7 @@ def _rule(country: str) -> tuple[str, Rule]:
 
 
 def _canonical(rule: Rule, code: str) -> str | None:
-    if not isinstance(code, str):
+    if not issubclass(type(code), str):
         raise TypeError("code must be a str")
     parts = split(code)
     if parts is None:
@@ -37,8 +37,8 @@ def is_valid(country: str, code: str) -> bool:
     """Return whether ``code`` matches the postal code format for ``country``.
 
     ``country`` is an ISO 3166-1 alpha-2 code, case-insensitive (``"UK"`` reads as
-    ``"GB"``). Case, full-width forms and native digits in ``code`` are folded; spaces and
-    dashes are optional but allowed only where the country writes a separator. Raises
+    ``"GB"``). Case, full-width forms and decimal digits known to Python's Unicode database
+    in ``code`` are folded; spaces and dashes are optional at country separator positions. Raises
     :class:`UnknownCountryError` for a country without a rule.
     Non-string arguments raise :class:`TypeError`. Assignment is not checked.
 

@@ -30,9 +30,13 @@ Codes are stripped of surrounding Unicode whitespace, including line endings. In
 code, tabs, Unicode space separators and supported dashes are interchangeable at allowed
 separator positions. Runs of those separators are allowed. Leading or trailing dashes,
 embedded newlines, controls, punctuation and other scripts' letters are rejected.
-Full-width and half-width forms fold to their plain forms. All Unicode decimal digits
-fold to ASCII; superscripts and other compatibility characters do not. ASCII case folds
-to uppercase. Normalization is idempotent and preserves leading zeroes.
+Full-width and half-width forms fold to their plain forms; unsupported multi-character
+expansions such as U+FFE3 are rejected. Decimal digits recognized by the interpreter's
+Unicode database fold to ASCII; superscripts and other compatibility characters do not.
+The accepted digit repertoire depends on Python's bundled Unicode version, available as
+`unicodedata.unidata_version`. For example, Kawi digits are rejected on Python 3.10 and
+3.11 but accepted on Python 3.12 and later. ASCII case folds to uppercase. Normalization
+is idempotent and preserves leading zeroes.
 
 The accepted dashes are U+002D, U+00AD, U+FE63, U+2010 through U+2015, U+2212 and
 U+30FC (including its half-width form). This is input tolerance, not postal syntax.
@@ -98,6 +102,10 @@ timeout. The tests execute the Python blocks in this guide and the README.
 Set `POSTALCHECK_UPSTREAM` to a local data directory and run
 `python scripts/fetch_upstream.py` to fetch the manifest-pinned external sources.
 Tests skip cleanly if these files are absent; changed files fail their hash checks.
+The Eircode FAQ uses the manifest's `faq-text-v1` extraction: text nodes inside each
+`div[data-sf-field="Content"]` are joined with spaces, Unicode whitespace is collapsed,
+and each answer ends with a newline. Scripts, styles, attributes and session fields are
+excluded. Size and SHA-256 verify the extracted UTF-8 text, so changed answers still fail.
 No external text or dataset is distributed. Facts in the tables are transcribed from
 [libaddressinput](https://chromium-i18n.appspot.com/ssl-address/data), with the documented
 exceptions. See the source manifest for URLs, dates, sizes, hashes and licensing notes.

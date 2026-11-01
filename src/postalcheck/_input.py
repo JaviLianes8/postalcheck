@@ -15,10 +15,10 @@ def split(code: str) -> tuple[str, tuple[int, ...]] | None:
     """Return the compact upper-case code and its separator positions, or ``None``.
 
     Full-width and half-width forms fold to their plain form (other compatibility
-    characters such as superscripts do not), every Unicode decimal digit becomes its ASCII
-    digit, and any run of spaces (including tabs and no-break spaces) and dashes counts as
-    one separator. Line breaks and control characters, anything else that is not an ASCII
-    letter or digit, and a dash at either end make the input unusable.
+    characters such as superscripts do not), decimal digits known to Python's Unicode
+    database become ASCII, and any run of spaces (including tabs and no-break spaces) and
+    dashes counts as one separator. Line breaks and control characters, anything else that
+    is not an ASCII letter or digit, and a dash at either end make the input unusable.
     """
     chars: list[str] = []
     cuts: list[int] = []
@@ -26,6 +26,8 @@ def split(code: str) -> tuple[str, tuple[int, ...]] | None:
     for ch in str.strip(code):
         if unicodedata.decomposition(ch).startswith(_WIDTH_FORMS):
             ch = unicodedata.normalize("NFKC", ch)
+            if len(ch) != 1:
+                return None
         if ch == "\t" or ch in _DASHES or unicodedata.category(ch) == "Zs":
             pending = True
             continue

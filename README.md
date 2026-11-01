@@ -34,7 +34,8 @@ print(normalize("UK", "m1 1aa"))  # M1 1AA
 ### What the input may look like
 
 Case does not matter. Full-width forms (what Japanese and Chinese keyboards type), decimal
-digits of any script, Unicode dashes and non-breaking spaces are folded to plain ASCII.
+digits recognized by Python's Unicode database, Unicode dashes and non-breaking spaces are
+folded to plain ASCII. Newer digit scripts may require a newer Python version.
 Spaces (including tabs and no-break spaces) and dashes are optional and interchangeable,
 but only where the country writes a separator, or where libaddressinput allows an optional
 one (France `75 008`, Brunei `BT 2328`, and after the `AI-` and `PC ` prefixes of Anguilla
@@ -75,7 +76,8 @@ except UnknownCountryError as error:
 without a current assignment guarantee.
 `UnknownCountryError.has_postal_codes` is `False` for the 70 countries and territories that
 have no postal-code format in the source snapshot (Hong Kong, Qatar, Panama, ...), so a form can hide the field, and
-`None` for a code that is not a country (including any country string that is not ASCII).
+`None` for a code that is not a country. Surrounding Unicode whitespace is trimmed first;
+country keys that still contain non-ASCII characters after trimming are unknown.
 Both errors subclass `ValueError` and survive pickling. `UnknownCountryError.country` is the
 country as given; `InvalidPostalCodeError.country` is the resolved ISO code (`GB` for
 `uk`) and `.code` the code as given.

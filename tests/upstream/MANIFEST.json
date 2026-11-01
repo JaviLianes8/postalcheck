@@ -18,14 +18,6 @@
     "sha256": "e5d46fe105832ebda145cc9bb538c4b5a041332d1587f7fbc26634e7d1e7dcbb",
     "licence": "CC BY-SA 4.0, Wikipedia contributors"
   },
-  "eircode-faq.html": {
-    "url": "https://www.eircode.ie/faqs",
-    "fetched": "2026-11-01",
-    "revision": "live snapshot",
-    "size": 215611,
-    "sha256": "bd588d4fa61252937b45ac2ad1f7ac86867e3e50673f492c0d6c885e5296bd12",
-    "licence": "Eircode website copyright; local verification only"
-  },
   "libaddressinput-readme.md": {
     "url": "https://raw.githubusercontent.com/google/libaddressinput/master/README.md",
     "fetched": "2026-11-01",
@@ -41,5 +33,15 @@
     "size": 109990,
     "sha256": "f91a01689813522df9e00caadda573abdff6d1d9082d1941b90eec93f3bf822b",
     "licence": "UPU copyright; local verification only"
+  },
+  "eircode-faq.txt": {
+    "url": "https://www.eircode.ie/faqs",
+    "fetched": "2026-11-01",
+    "revision": "answer text snapshot, faq-text-v1",
+    "size": 29785,
+    "sha256": "f0880a6395c4f67c9c714613fd7a7ef9e097178227f3bae5b8d6e56560198545",
+    "licence": "Eircode website copyright; local verification only",
+    "title": "Eircode FAQ answer text, excluding session fields",
+    "extract": "faq-text-v1"
   }
 }

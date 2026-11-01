@@ -5,6 +5,7 @@ Slow and needs the build backend, so it runs only with POSTALCHECK_E2E=1.
 
 from __future__ import annotations
 
+import asyncio
 import os
 import subprocess
 import sys
@@ -14,6 +15,7 @@ import zipfile
 from pathlib import Path
 
 import pytest
+from cli_process import check_streaming
 from packaging.requirements import Requirement
 from upgrade_program import CHECK_NEW_PICKLES, CHECK_OLD_PICKLES, DIFFERENCES, SNAPSHOT
 
@@ -97,12 +99,14 @@ def wheel(tmp_path_factory: pytest.TempPathFactory) -> Path:
     return wheel_path
 
 
-def test_installed_wheel_end_to_end(tmp_path: Path, wheel: Path) -> None:
+@pytest.mark.parametrize("distribution", ["wheel", "sdist"])
+def test_installed_wheel_end_to_end(tmp_path: Path, wheel: Path, distribution: str) -> None:
     env_dir = tmp_path / "venv"
     venv.create(env_dir, with_pip=True)
     bindir = env_dir / ("Scripts" if sys.platform == "win32" else "bin")
     python = bindir / "python"
-    installed = _run(python, "-m", "pip", "install", "-q", wheel)
+    artifact = wheel if distribution == "wheel" else next(wheel.parent.glob("*.tar.gz"))
+    installed = _run(python, "-m", "pip", "install", "-q", artifact)
     assert installed.returncode == 0, installed.stderr
 
     # Run from an empty folder so the source tree cannot shadow the install.
@@ -121,6 +125,8 @@ def test_installed_wheel_end_to_end(tmp_path: Path, wheel: Path) -> None:
     )
     unknown = _run(python, "-m", "postalcheck", "ZZ", cwd=work)
     assert unknown.returncode == 2
+    for command in ([str(script)], [str(python), "-I", "-m", "postalcheck"]):
+        asyncio.run(check_streaming(command, work))
 
 
 @pytest.mark.skipif(os.environ.get("POSTALCHECK_PYPI") != "1", reason="set POSTALCHECK_PYPI=1")

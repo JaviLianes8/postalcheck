@@ -69,6 +69,7 @@ def main(
         for code in codes:
             try:
                 stdout.write(normalize(args.country, code) + "\n")
+                stdout.flush()
             except InvalidPostalCodeError:
                 stderr.write("invalid postal code format\n")
                 status = 1
