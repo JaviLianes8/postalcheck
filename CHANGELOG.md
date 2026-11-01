@@ -6,6 +6,51 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-01
+
+### Stable
+
+- The six public names, signatures and defaults from 0.2.1, the 182 bundled formats,
+  Unicode folding, canonical layouts, UK alias and error attributes are retained.
+- Python 3.10 through 3.14, zero runtime dependencies, and packaged type information.
+
+### Changed
+
+- Exception messages and CLI diagnostics no longer echo input values. Invalid codes
+  report `invalid postal code format`; unknown countries report `unsupported country
+  code` or `country does not use postal codes`. CLI usage errors report `invalid
+  arguments; use --help`. Attributes retain the original inputs for deliberate access.
+- Non-string arguments still raise `TypeError`, but messages omit the type name.
+- Error classes identify their public module as `postalcheck` for new pickles. Existing
+  0.2.1 pickles still load; new pickles also load in 0.2.1.
+- String subclasses use the underlying string value instead of overridden `strip` methods.
+- CLI closed-pipe handling uses an in-memory output replacement, retaining exit status 1.
+
+### Fixed
+
+- CLI results are flushed after each successful input, including when stdout is piped
+  and stdin remains open. Output failures still exit quietly with status 1.
+- Unsupported multi-character width expansions, including U+FFE3 FULLWIDTH MACRON, return
+  `False` from `is_valid` and raise `InvalidPostalCodeError` from `normalize`. CLI batches
+  reject the input and continue processing subsequent codes.
+- Non-string arguments with hostile `__class__` hooks raise the documented safe
+  `TypeError` without invoking those hooks; actual string subclasses remain supported.
+- The source fetcher verifies deterministic Eircode FAQ answer text, excluding dynamic
+  session fields, against the manifest instead of hashing the entire HTML response.
+- Documentation clarifies that Unicode digit coverage follows the interpreter's Unicode
+  database and that country keys are trimmed of Unicode whitespace before ASCII checks.
+- The historical Ireland entry describes routing-key initial letters and the D6W
+  exception correctly; complete routing-key assignment is not checked.
+
+### Added
+
+- Runnable public docstrings, a detailed guide, stronger contracts and seeded hostile-input
+  tests, installed-wheel and PyPI upgrade checks, and release validation metadata.
+- `POSTALCHECK_UPSTREAM` selects a separate local folder for fetched test data.
+- Regression contracts reject embedded U+FFE3 at every internal position, require streamed
+  CLI results after invalid input, and pin FAQ character references, Unicode whitespace
+  and text around nested divs. These tests preserve the existing behavior.
+
 ## [0.2.1] - 2026-10-13
 
 ### Changed
@@ -25,8 +70,8 @@ All notable changes to this project are documented here. The format follows
 - `UnknownCountryError.has_postal_codes`, `False` for the 70 countries and territories
   without postal codes. Both errors keep their inputs (`country`, `code`) and pickle.
 - `UK` is read as `GB`.
-- Full-width forms, decimal digits of any script, Unicode dashes and no-break spaces in
-  the input are folded to ASCII.
+- Full-width forms, decimal digits recognized by Python's Unicode database, Unicode dashes
+  and no-break spaces in the input are folded to ASCII.
 - Command line: `postalcheck COUNTRY [CODE ...]` and `python -m postalcheck`, reading
   UTF-8 lines from standard input when no code is given.
 
@@ -37,11 +82,12 @@ All notable changes to this project are documented here. The format follows
   a code are refused.
 - Matching is ASCII only: other scripts' digits are converted first, never matched as is.
 - A non-`str` argument raises `TypeError` with a clear message.
-- A country string that is not ASCII is unknown: `str.upper()` no longer turns `ıt` into
-  `IT`.
+- A country key that is not ASCII after surrounding Unicode whitespace is stripped is
+  unknown: `str.upper()` no longer turns `ıt` into `IT`.
 - Ireland: the last four characters follow the Eircode FAQ (any digit or letter except O),
-  which accepts some letters the 0.1.0 table refused (`A65 BBBB`); the routing key is
-  checked against the 139 published routing keys.
+  which accepts some letters the 0.1.0 table refused (`A65 BBBB`). Routing keys restrict
+  the initial letter to those in the 139 published keys, followed by two digits, with
+  D6W as an exception. Complete routing-key membership is not checked.
 
 ### Fixed
 

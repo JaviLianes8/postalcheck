@@ -1,11 +1,18 @@
-"""Validate and normalize postal and ZIP codes by ISO country code."""
+"""Validate and normalize postal code formats by country key.
+
+>>> import postalcheck
+>>> postalcheck.__version__
+'1.0.0'
+"""
 
 from __future__ import annotations
 
 from ._core import example, is_valid, normalize, supported_countries
 from ._errors import InvalidPostalCodeError, UnknownCountryError
 
-__version__ = "0.2.1"
+del annotations
+
+__version__ = "1.0.0"
 
 __all__ = [
     "InvalidPostalCodeError",

@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import importlib
 import json
+import os
 import random
 import re
 from functools import cache
@@ -19,15 +20,17 @@ from typing import Any
 import pytest
 
 FOLDER = Path(__file__).resolve().parent / "upstream"
+DATA = Path(os.environ.get("POSTALCHECK_UPSTREAM", str(FOLDER)))
 
 
 def read_upstream(name: str) -> str:
     """Return a fetched third-party file, or skip the calling test when it is absent."""
-    path = FOLDER / name
+    path = DATA / name
     if not path.is_file():
         pytest.skip(f"{name} is not fetched; run python scripts/fetch_upstream.py")
     entry = json.loads((FOLDER / "MANIFEST.json").read_text(encoding="utf-8"))[name]
     body = path.read_bytes()
+    assert len(body) == entry["size"], f"{name} differs from MANIFEST"
     assert hashlib.sha256(body).hexdigest() == entry["sha256"], f"{name} differs from MANIFEST"
     return body.decode("utf-8")
 

@@ -20,7 +20,7 @@ def test_normalize_raises_with_the_inputs_attached() -> None:
     with pytest.raises(InvalidPostalCodeError) as caught:
         normalize("de", "abcde")
     assert (caught.value.country, caught.value.code) == ("DE", "abcde")
-    assert str(caught.value) == "'abcde' is not a valid DE postal code"
+    assert str(caught.value) == "invalid postal code format"
     assert isinstance(caught.value, ValueError)
 
 
@@ -31,23 +31,23 @@ def test_an_unknown_country_is_refused(call: object) -> None:
         call("ZZ", "12345")
     assert caught.value.country == "ZZ"
     assert caught.value.has_postal_codes is None
-    assert str(caught.value) == "'ZZ' is not a supported country code"
+    assert str(caught.value) == "unsupported country code"
 
 
 def test_a_country_without_postal_codes_says_so() -> None:
     with pytest.raises(UnknownCountryError) as caught:
         example("hk")
     assert caught.value.has_postal_codes is False
-    assert str(caught.value) == "'hk' does not use postal codes"
+    assert str(caught.value) == "country does not use postal codes"
 
 
 def test_errors_survive_pickling() -> None:
     invalid = pickle.loads(pickle.dumps(InvalidPostalCodeError("DE", "x")))
     assert (invalid.country, invalid.code) == ("DE", "x")
-    assert str(invalid) == "'x' is not a valid DE postal code"
+    assert str(invalid) == "invalid postal code format"
     unknown = pickle.loads(pickle.dumps(UnknownCountryError("HK", False)))
     assert (unknown.country, unknown.has_postal_codes) == ("HK", False)
-    assert str(unknown) == "'HK' does not use postal codes"
+    assert str(unknown) == "country does not use postal codes"
 
 
 def test_both_errors_are_value_errors() -> None:

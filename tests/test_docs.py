@@ -42,7 +42,7 @@ def test_the_command_line_example_prints_what_the_readme_shows() -> None:
         capture_output=True,
         text=True,
         check=False,
-        cwd=ROOT / "src",
+        cwd=ROOT / "src" if (ROOT / "src").exists() else None,
     )
     assert result.returncode == 1
     assert result.stdout.splitlines() + result.stderr.splitlines() == shown
