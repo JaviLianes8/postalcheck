@@ -10,11 +10,57 @@ Progress:
 - [x] Every available supported interpreter (item 10).
 - [x] Archive inspection and final four gates (items 14-15).
 - [x] Deliberate mutation round (item 18).
-- [x] QA round 1 fixes and regression contracts; independent re-review pending.
-- [x] QA round 2 contract gaps fixed; independent lens E re-review pending.
-- [ ] Independent reviewer (item 16).
-- [ ] Five independent QA lenses (item 19).
+- [x] QA round 1 fixes and regression contracts; all five lenses passed re-review.
+- [x] QA round 2 contract gaps fixed; lens E passed round 3.
+- [x] Independent reviewer (item 16): PASS, round 1.
+- [x] Five independent QA lenses (item 19): all PASS.
 - [ ] Merge and publication (item 17).
+
+## Final QA and review (2026-11-01)
+
+All findings are resolved. Report paths below are relative to the external
+`scratch/postalcheck-cert/` evidence directory; reports are not distributed.
+
+| Lens | Rounds | Final verdict | Report path | Reviewed commit |
+| --- | ---: | --- | --- | --- |
+| a: API and documentation | 2 | PASS | `lens-a-r2/REPORT.md` | `cb5bac5f2cf7f1aafc36f3c590c3a1b56fac746e` |
+| b: Correctness and ground truth | 2 | PASS | `lens-b-r2/REPORT.md` | `cb5bac5f2cf7f1aafc36f3c590c3a1b56fac746e` |
+| c: Adversarial and robustness | 2 | PASS | `lens-c-r2/REPORT.md` | `cb5bac5f2cf7f1aafc36f3c590c3a1b56fac746e` |
+| d: Packaging and end-to-end | 2 | PASS | `lens-d-r2/REPORT.md` | `cb5bac5f2cf7f1aafc36f3c590c3a1b56fac746e` |
+| e: Contract strength | 3 | PASS | `lens-e-r3/REPORT.md` | `43bf75b3f44b8a5bfbda5791bd5fb1518aae8667` |
+
+The runtime and source fetcher reviewed by lenses a-d are unchanged at the final
+reviewed commit. Only five test files and two documentation files changed between
+their reviewed commit and `43bf75b3f44b8a5bfbda5791bd5fb1518aae8667`.
+Lens e rejected all five prior mutations and ten new mutations at that commit.
+
+Independent reviewer: **PASS**, round 1, commit
+`43bf75b3f44b8a5bfbda5791bd5fb1518aae8667`, report `review-r1/REPORT.md`.
+All 18 review-scoped items pass; there are no open findings or requested fixes.
+The scorecard below summarizes that report. Item 17 remains pending merge and
+publication and is excluded from the review verdict; neither action is certified
+as completed here.
+
+| Item | Final verdict | Review evidence |
+| --- | --- | --- |
+| 1. Stable public API | PASS | Six exports, signatures, defaults and upgrade behavior verified. |
+| 2. Exact public surface | PASS | Exact exports and documentation imports checked. |
+| 3. Runnable docstrings | PASS | 17 doctest examples plus README, GUIDE and CLI examples pass. |
+| 4. End-to-end typing | PASS | Strict source/test typing, installed consumer and type marker pass. |
+| 5. Safe typed errors | PASS | Hostile types, bounded messages, attributes and serialization checked. |
+| 6. Complete behavioral contracts | PASS | API, Unicode, errors and installed streaming contracts pass. |
+| 7. Real ground truth | PASS | Five fresh sources match manifests; source examples and oracle pass. |
+| 8. Real end-to-end and upgrade | PASS | Wheel/sdist consumers, both CLI entry points and PyPI 0.2.1 upgrade pass. |
+| 9. Seeded fuzz and scaling | PASS | Seeded properties and hostile inputs pass; measured growth is linear. |
+| 10. Supported interpreters | PASS | All seven available configurations pass, covering Python 3.10-3.14. |
+| 11. README and rendering | PASS | Strict artifact checks, Markdown rendering and absolute links verified. |
+| 12. Dated changelog | PASS | Dated 1.0.0 section states stability and intentional behavior changes. |
+| 13. Release metadata | PASS | Version 1.0.0, stable classifier, Python support and dependency metadata agree. |
+| 14. Distribution contents | PASS | 16 wheel and 43 sdist entries inspected; licenses and hashes verified. |
+| 15. Independent gates | PASS | Four gates pass; full suite has 2,319 passes and one intentional skip. |
+| 16. Independent review | PASS | Fresh-clone review completed without changes or open findings. |
+| 18. Contracts reject mutations | PASS | All 12 additional review mutations fail behavioral contracts. |
+| 19. Five QA lenses | PASS | All five final reports and their execution evidence verified. |
 
 ## Baseline and API
 
@@ -57,7 +103,7 @@ if files are absent and verify their size and digest if present.
 
 All five lenses reported FAIL on `ce67801aacf88dd1f9da9c3645d054a1e8e6575d`.
 Fix commit: `88f4d43709f9fbcc72e5631cc52270e9b7c9e7c1`.
-All 17 findings are addressed locally; independent re-review of each lens remains pending.
+All 17 findings were fixed; final independent verdicts are recorded above.
 The public API, country formats and canonical layouts are unchanged.
 
 | Findings | Changes and contract evidence |
@@ -93,7 +139,7 @@ The 609 new contracts also passed from the extracted sdist against the installed
 with the source package excluded from the extracted tree.
 Evidence is retained outside the repository in certification scratch folders `fix-r1`
 and `fix-r1-complete`: red/green contracts, six mutation logs, fetches, matrix and gates.
-Items 16 and 19 require independent approval; merge and publication remain pending.
+Items 16 and 19 subsequently passed as recorded above; merge and publication remain pending.
 
 ## QA round 2 (2026-11-01)
 
@@ -102,7 +148,7 @@ Fix commit: `98bea5670af6b850257fc0493be78b32723a3735`
 (`strengthen unicode streaming and faq contracts`).
 All five findings are contract gaps: their original witnesses pass on the reviewed code.
 The fixes add regression tests without changing production behavior or the public API.
-No finding is disputed. Independent lens E re-review remains pending.
+No finding is disputed. Lens E subsequently passed round 3 as recorded above.
 
 | Finding | Added contract | Exact mutation replay |
 | --- | --- | --- |
