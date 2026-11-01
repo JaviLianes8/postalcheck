@@ -11,6 +11,7 @@ Progress:
 - [x] Archive inspection and final four gates (items 14-15).
 - [x] Deliberate mutation round (item 18).
 - [x] QA round 1 fixes and regression contracts; independent re-review pending.
+- [x] QA round 2 contract gaps fixed; independent lens E re-review pending.
 - [ ] Independent reviewer (item 16).
 - [ ] Five independent QA lenses (item 19).
 - [ ] Merge and publication (item 17).
@@ -93,6 +94,37 @@ with the source package excluded from the extracted tree.
 Evidence is retained outside the repository in certification scratch folders `fix-r1`
 and `fix-r1-complete`: red/green contracts, six mutation logs, fetches, matrix and gates.
 Items 16 and 19 require independent approval; merge and publication remain pending.
+
+## QA round 2 (2026-11-01)
+
+Lens E reported five surviving mutations on `cb5bac5f2cf7f1aafc36f3c590c3a1b56fac746e`.
+Fix commit: `98bea5670af6b850257fc0493be78b32723a3735`
+(`strengthen unicode streaming and faq contracts`).
+All five findings are contract gaps: their original witnesses pass on the reviewed code.
+The fixes add regression tests without changing production behavior or the public API.
+No finding is disputed. Independent lens E re-review remains pending.
+
+| Finding | Added contract | Exact mutation replay |
+| --- | --- | --- |
+| E-R2-N07 | Reject U+FFE3 at every internal position of all 182 country examples through is_valid and normalize, including error attributes. Exercise argv and stdin batches across ten layouts, including legal separator positions. | 53 failures in `test_multicharacter_width_folding_is_invalid_inside_codes` and `test_embedded_width_expansions_are_rejected_in_batches`. |
+| E-R2-N12 | Read the invalid-line diagnostic, then require each of two valid results before stdin closes and final exit status 1. Cover source and both entry points installed from wheel and sdist. | `test_results_arrive_before_stdin_eof[True]` fails waiting for the first valid result. |
+| E-R2-N16 | Decode named, decimal and hexadecimal references to exact UTF-8 bytes, then verify fetched output against the expected size and SHA-256. | All three `test_faq_character_references_are_decoded` cases fail. |
+| E-R2-N17 | Collapse repeated tabs, line breaks and Unicode whitespace, preserving exact UTF-8 content and the terminal newline through extraction and manifest verification. | All seven `test_faq_unicode_whitespace_is_collapsed` cases fail. |
+| E-R2-N18 | Preserve text before, inside and after nested, deeply nested and sibling divs; keep separate answers in order and exclude surrounding page text. Verify output bytes and manifest integrity. | All three `test_faq_text_surrounding_nested_divs_is_preserved` cases fail. |
+
+All **806 focused contracts passed** on the unmodified implementation. Each exact reported
+mutation was then injected separately: its original witness passed, its mutated witness
+failed, and the new contracts failed. Source files were restored byte-for-byte afterward.
+The new examples are hand-written. Evidence and replay scripts are retained in certification
+scratch folder `fix-r2`, including original and mutated probes, contract failures and hashes.
+
+Release gates each exited 0: `ruff format --check .`, `ruff check .`,
+`mypy --strict src`, and `pytest`. The additional `mypy --strict src tests` check
+also passed. The complete suite on Python 3.14.6 passed **2,319 tests**, with one
+intentional Ireland oracle skip, in 79.30 seconds. External fixtures, wheel and sdist
+installation, both installed CLI entry points, and the live 0.2.1 upgrade were enabled.
+Every test used a 300-second timeout; temporary files remained in certification scratch.
+Final gate evidence is retained in `fix-r2-final/evidence`.
 
 ## Preparation packaging and upgrade (items 8, 10, 13, 14)
 
